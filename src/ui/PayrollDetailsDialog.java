@@ -38,9 +38,37 @@ public class PayrollDetailsDialog extends JDialog {
         setMinimumSize(new Dimension(650, 700));
     }
 
-	PayrollDetailsDialog(EnhancedEmployeeDashboard aThis, Employee currentUser, String period) {
-		throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-	}
+    public PayrollDetailsDialog(Frame parent, Employee employee, String period) {
+        super(parent, "Payroll Details - " + employee.getFullName(), true);
+        this.employee = employee;
+        this.jasperReportService = new JasperReportService();
+        
+        // Create a placeholder payroll for the period
+        this.payroll = createPlaceholderPayroll(employee, period);
+        
+        initializeComponents();
+        setupLayout();
+        generatePayslip();
+        
+        setSize(700, 800);
+        setLocationRelativeTo(parent);
+        setResizable(true);
+        setMinimumSize(new Dimension(650, 700));
+    }
+    
+    private Payroll createPlaceholderPayroll(Employee employee, String period) {
+        Payroll payroll = new Payroll();
+        payroll.setEmployeeId(employee.getEmployeeId());
+        payroll.setMonthlyRate(employee.getBasicSalary());
+        payroll.setDaysWorked(22);
+        payroll.setGrossPay(employee.getBasicSalary());
+        payroll.setTotalDeductions(employee.getBasicSalary() * 0.2);
+        payroll.setNetPay(employee.getBasicSalary() * 0.8);
+        payroll.setRiceSubsidy(employee.getRiceSubsidy());
+        payroll.setPhoneAllowance(employee.getPhoneAllowance());
+        payroll.setClothingAllowance(employee.getClothingAllowance());
+        return payroll;
+    }
 
     private void initializeComponents() {
         payslipTextArea = new JTextArea();

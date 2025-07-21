@@ -69,10 +69,10 @@ public class DBConnection {
                 LOGGER.info("✅ Database connection test successful");
             } else {
                 LOGGER.warning("⚠️ Database connection test failed - connection invalid");
-        // CORRECTED: Using 'password' column (not 'password_hash' as that doesn't exist in our schema)
+            }
             return isValid;
         } catch (SQLException e) {
-                "WHERE e.employee_id = ? AND c.password = ?";
+            LOGGER.log(Level.WARNING, "⚠️ Database connection test failed", e);
             return false;
         }
     }
@@ -92,9 +92,9 @@ public class DBConnection {
         }
     }
     
-                    // Enhanced debugging with correct column names  
-                    String debugQuery = "SELECT c.employee_id, c.password, " +
-     * @return Database connection details (without password)
+    /**
+     * Get database connection details (without password)
+     * @return Database connection details
      */
     public static String getDatabaseInfo() {
         return String.format("Database: %s@%s:%s/%s", 
@@ -103,15 +103,17 @@ public class DBConnection {
     
     /**
      * Check if database and required tables exist
-                                String actualPassword = debugRs.getString("password");
+     * @return true if database is properly set up
+     */
     public static boolean isDatabaseSetup() {
         try (Connection connection = getConnection()) {
             // Check if main tables exist
             String[] requiredTables = {
                 "employees", "credentials", "attendance", 
-                                LOGGER.info(String.format("   Stored Password: %s", actualPassword));
+                "payroll", "leave_request"
+            };
             
-                                LOGGER.info(String.format("   Password Match: %s", password.equals(actualPassword)));
+            for (String table : requiredTables) {
                 try {
                     connection.prepareStatement("SELECT 1 FROM " + table + " LIMIT 1").executeQuery();
                 } catch (SQLException e) {

@@ -67,7 +67,7 @@ public class DashboardFactory {
             case HR_MANAGER:
             case HR_SPECIALIST:
             case HR_ASSISTANT:
-                return new HRDashboard(employee);
+                return new view.HRDashboard(employee);
                 
             // Payroll & Finance Dashboards
             case PAYROLL_ADMIN:
@@ -96,7 +96,7 @@ public class DashboardFactory {
             case CONTRACTOR:
             case INTERN:
             default:
-                return new EmployeeDashboard(employee);
+                return new view.EmployeeDashboard(employee);
         }
     }
     

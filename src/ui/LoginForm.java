@@ -3,7 +3,6 @@ package ui;
 import dao.EmployeeDAO;
 import model.Employee;
 import util.DBConnection;
-// NEW IMPORTS - Add these for the enhanced functionality
 import view.DashboardFactory;
 import util.PositionRoleMapper;
 import model.UserRole;
@@ -448,10 +447,9 @@ public class LoginForm extends JFrame {
 
     // FIXED: Authentication method with correct column name 'password_hash'
     private boolean authenticateUser(int employeeId, String password) {
-        // CORRECTED: Using 'password_hash' column instead of 'password'
         String query = "SELECT e.employee_id, e.first_name, e.last_name, e.position FROM employees e " +
                 "JOIN credentials c ON e.employee_id = c.employee_id " +
-                "WHERE e.employee_id = ? AND c.password_hash = ?";
+                "WHERE e.employee_id = ? AND c.password = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -472,7 +470,7 @@ public class LoginForm extends JFrame {
                     LOGGER.warning(String.format("❌ Authentication FAILED for employee ID: %d", employeeId));
                     
                     // Enhanced debugging with correct column names
-                    String debugQuery = "SELECT c.employee_id, c.username, c.password_hash, " +
+                    String debugQuery = "SELECT c.employee_id, c.password, " +
                             "e.first_name, e.last_name " +
                             "FROM credentials c " +
                             "JOIN employees e ON c.employee_id = e.employee_id " +
@@ -482,17 +480,15 @@ public class LoginForm extends JFrame {
                         debugStmt.setInt(1, employeeId);
                         try (ResultSet debugRs = debugStmt.executeQuery()) {
                             if (debugRs.next()) {
-                                String username = debugRs.getString("username");
-                                String actualPasswordHash = debugRs.getString("password_hash");
+                                String actualPassword = debugRs.getString("password");
                                 String firstName = debugRs.getString("first_name");
                                 String lastName = debugRs.getString("last_name");
                                 
                                 LOGGER.info(String.format("🔍 Debug Info for Employee %d:", employeeId));
                                 LOGGER.info(String.format("   Name: %s %s", firstName, lastName));
-                                LOGGER.info(String.format("   Username: %s", username));
-                                LOGGER.info(String.format("   Stored Password Hash: %s", actualPasswordHash));
+                                LOGGER.info(String.format("   Stored Password: %s", actualPassword));
                                 LOGGER.info(String.format("   Provided Password: %s", password));
-                                LOGGER.info(String.format("   Password Match: %s", password.equals(actualPasswordHash)));
+                                LOGGER.info(String.format("   Password Match: %s", password.equals(actualPassword)));
                             } else {
                                 LOGGER.warning("❌ Employee ID does not exist in credentials table: " + employeeId);
                             }
@@ -508,10 +504,6 @@ public class LoginForm extends JFrame {
             return false;
         }
     }
-
-    // ========================================
-    // ENHANCED LOGIN SUCCESS HANDLER - REPLACES OLD METHOD
-    // ========================================
     /**
      * Enhanced handleSuccessfulLogin method with position-based dashboard system
      * This method integrates the position-based dashboard system with login flow
@@ -806,10 +798,6 @@ public class LoginForm extends JFrame {
     private String getDashboardName(Employee employee) {
         return DashboardFactory.getDashboardName(employee);
     }
-
-    // ========================================
-    // INNER CLASS FOR LOGIN RESULT
-    // ========================================
     
     /**
      * Inner class to encapsulate login results
@@ -837,10 +825,6 @@ public class LoginForm extends JFrame {
             return errorMessage;
         }
     }
-
-    // ========================================
-    // MAIN METHOD FOR TESTING
-    // ========================================
     
     public static void main(String[] args) {
         // Set system look and feel
